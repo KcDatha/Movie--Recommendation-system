@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Recommendation System</title>
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body Styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #141414; /* Netflix dark background */
+            color: #f1f1f1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Header Section */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            color: #e50914; /* Netflix red */
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 8px rgba(229, 9, 20, 0.6);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: #a6a6a6;
+        }
+
+        /* Search Section */
+        .search-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .search-container input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1rem;
+            border: 2px solid #333;
+            border-radius: 6px;
+            background-color: #1e1e1e;
+            color: #f1f1f1;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .search-container input:focus {
+            outline: none;
+            border-color: #e50914;
+            box-shadow: 0 0 8px rgba(229, 9, 20, 0.7);
+        }
+
+        .search-container button {
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #fff;
+            background: linear-gradient(45deg, #e50914, #b20710);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
+        }
+
+        .search-container button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(229, 9, 20, 0.6);
+        }
+
+        .search-container button:active {
+            transform: scale(0.95);
+        }
+
+        /* Recommendations Section */
+        .recommendations {
+            margin-top: 30px;
+            width: 100%;
+            max-width: 600px;
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .recommendations h2 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #e50914;
+            border-bottom: 2px solid #e50914;
+            padding-bottom: 5px;
+        }
+
+        .recommendations p {
+            font-size: 1rem;
+            margin-bottom: 8px;
+            color: #ddd;
+            line-height: 1.6;
+        }
+
+        /* Animation for Smooth Loading */
+        .recommendations p {
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 50px;
+            font-size: 0.9rem;
+            color: #a6a6a6;
+            text-align: center;
+        }
+
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>Movie Recommendations</h1>
+        <p>Discover movies tailored to your taste</p>
+    </header>
+
+    <section class="search-container">
+        <input type="text" id="movieInput" placeholder="Enter a movie name..." />
+        <button onclick="getRecommendations()">Get Recommendations</button>
+    </section>
+
+    <section class="recommendations" id="recommendations">
+        <h2>Recommended Movies</h2>
+        <!-- Recommendations will appear here -->
+    </section>
+
+    <footer class="footer">
+        <p>&copy; 2024 Movie Recommender | Powered by <strong>Your Creativity</strong></p>
+    </footer>
+
+    <script>
+        // Function to get recommendations from the backend
+        async function getRecommendations() {
+            const movieName = document.getElementById("movieInput").value;
+
+            const recommendationsDiv = document.getElementById("recommendations");
+            recommendationsDiv.innerHTML = "<p>Loading recommendations...</p>";
+
+            try {
+                const response = await fetch("http://127.0.0.1:8000/recommend", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ movie_name: movieName }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    recommendationsDiv.innerHTML = data.map(
+                        (movie) => `<p>🎬 ${movie.title}</p>`
+                    ).join("");
+                } else {
+                    recommendationsDiv.innerHTML = `<p>${data.error}</p>`;
+                }
+            } catch (error) {
+                console.error("Error fetching recommendations:", error);
+                recommendationsDiv.innerHTML = `<p>Failed to fetch recommendations. Check console for details.</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
